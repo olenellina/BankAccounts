@@ -6,7 +6,7 @@ module Bank
         raise ArgumentError.new("A new account cannot be created with initial negative balance")
       end
       @id = id
-      @balance = balance
+      @balance = sprintf('%0.2f', balance.round(2))
       @owner = Owner.new(id, name, address)
     end
 
