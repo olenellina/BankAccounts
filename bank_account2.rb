@@ -21,12 +21,12 @@ module Bank
 
   # Account class will handle any functionality related to the bank accounts (withdraw, deposit, balance, etc.)
   class Account
-    @@accounts = []
+    @@accounts = {}
     attr_reader :balance, :accounts
 
     # Handles initializing new Account objects
     def initialize(id, balance, openDate)
-      newAccount = (@id = id.to_i, @balance = balance.to_i, @openDate = openDate)
+      newAccount = {:@id = id.to_i, :@balance = balance.to_i, :@openDate = openDate)
       # Raising an ArgumentError, should a bank account be created with a negative balance
       unless balance.to_i >= 0
         raise ArgumentError.new("A new account cannot be created with initial negative balance")
