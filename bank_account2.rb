@@ -21,18 +21,17 @@ module Bank
 
   # Account class will handle any functionality related to the bank accounts (withdraw, deposit, balance, etc.)
   class Account
-    @@acounts
-    attr_reader :balance
+    @@accounts = []
+    attr_reader :balance, :accounts
 
     # Handles initializing new Account objects
     def initialize(id, balance, openDate)
+      newAccount = (@id = id.to_i, @balance = balance.to_i, @openDate = openDate)
       # Raising an ArgumentError, should a bank account be created with a negative balance
       unless balance.to_i >= 0
         raise ArgumentError.new("A new account cannot be created with initial negative balance")
       end
-      @id = id.to_i
-      @balance = balance.to_i
-      @openDate = openDate
+      @@accounts << newAccount
       puts "Account ID #{id} has been created!"
       # Creating a new Owner object that is associated with the account that was just initialized
       # In addition to name & address, id is passed to the new Owner object so that a message can be displayed
@@ -63,29 +62,32 @@ module Bank
     def nicePrint(amount)
       return sprintf('%0.2f', amount.round(2))
     end
-  end
 
-    def csvAccounts(csvfile)
-      accountsArray = []
+    def self.csvAccounts(csvfile)
+      accountArray = []
       counter = 0
-
       CSV.open(csvfile, "r").each do |line|
-        accountsArray[counter] = line
+        accountArray[counter] = line
         counter += 1
       end
 
-      accountsArray.length.times do |x|
-        @@acounts << Bank::Account.new(accountsArray[x][0], accountsArray[x][1], accountsArray[x][2])
+      accountArray.length.times do |x|
+        Account.new(accountArray[x][0], accountArray[x][1], accountArray[x][2])
       end
+    end
+
+    def self.all
+      @@accounts
     end
 
   end
 end
 
 
-Bank:Account.csvAccounts("accounts.csv")
+Bank::Account.csvAccounts("accounts.csv")
+print Bank::Account.all
 
 # Testing Account class operations
-newAccounts[0].withdraw(20)
-newAccounts[0].deposit(20)
-newAccounts[0].withdraw(60)
+Bank::Account.withdraw(20)
+# Bank::Account.accounts.deposit(20)
+# Bank::Account.accounts.withdraw(60)
