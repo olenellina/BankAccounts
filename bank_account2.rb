@@ -21,6 +21,7 @@ module Bank
 
   # Account class will handle any functionality related to the bank accounts (withdraw, deposit, balance, etc.)
   class Account
+    @@acounts
     attr_reader :balance
 
     # Handles initializing new Account objects
@@ -63,23 +64,26 @@ module Bank
       return sprintf('%0.2f', amount.round(2))
     end
   end
+
+    def csvAccounts(csvfile)
+      accountsArray = []
+      counter = 0
+
+      CSV.open(csvfile, "r").each do |line|
+        accountsArray[counter] = line
+        counter += 1
+      end
+
+      accountsArray.length.times do |x|
+        @@acounts << Bank::Account.new(accountsArray[x][0], accountsArray[x][1], accountsArray[x][2])
+      end
+    end
+
+  end
 end
 
 
-# The below tests to ensure that the ArgumentError is raised for an account with an opening negative balance
-# myAccount = Bank::Account.new(123, -40)
-
-accountsArray = []
-counter = 0
-CSV.open("accounts.csv", "r").each do |line|
-  accountsArray[counter] = line
-  counter += 1
-end
-
-newAccounts = []
-accountsArray.length.times do |x|
-  newAccounts << Bank::Account.new(accountsArray[x][0], accountsArray[x][1], accountsArray[x][2])
-end
+Bank:Account.csvAccounts("accounts.csv")
 
 # Testing Account class operations
 newAccounts[0].withdraw(20)
