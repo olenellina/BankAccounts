@@ -53,18 +53,25 @@ module Bank
     end
 
   end
+
+  class CsvProcessor
+    def initialize(csvfile)
+      accountArray = []
+      counter = 0
+      CSV.open(csvfile, "r").each do |line|
+        accountArray[counter] = line
+        counter += 1
+      end
+
+      accountArray.length.times do |x|
+        Account.new(accountArray[x][0], accountArray[x][1], accountArray[x][2])
+      end
+    end
+  end
+
 end
 
-accountArray = []
-counter = 0
-CSV.open("accounts.csv", "r").each do |line|
-  accountArray[counter] = line
-  counter += 1
-end
-
-accountArray.length.times do |x|
-  Bank::Account.new(accountArray[x][0], accountArray[x][1], accountArray[x][2])
-end
+CsvProcessor.new("accounts.csv")
 
 Bank::Account.all[1].withdraw(20)
 print Bank::Account.all
