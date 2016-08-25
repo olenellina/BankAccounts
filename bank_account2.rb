@@ -31,9 +31,14 @@ module Bank
     end
 
     def deposit(depositAmount)
-      @balance += depositAmount
-      puts "You have made a deposit of $#{nicePrint(depositAmount)}. Your new balance is $#{nicePrint(@balance)}."
-      return @balance
+      if depositAmount < 0
+        puts "Sorry, you have to deposit a postive sum of money."
+        return @balance
+      else
+        @balance += depositAmount
+        puts "You have made a deposit of $#{nicePrint(depositAmount)}. Your new balance is $#{nicePrint(@balance)}."
+        return @balance
+      end
     end
 
     def nicePrint(amount)
@@ -66,15 +71,17 @@ module Bank
       accountArray.length.times do |x|
         Account.new(accountArray[x][0], accountArray[x][1], accountArray[x][2])
       end
+
     end
   end
 
 end
 
-CsvProcessor.new("accounts.csv")
+Bank::CsvProcessor.new("accounts.csv")
 
-Bank::Account.all[1].withdraw(20)
 print Bank::Account.all
+Bank::Account.all[1].withdraw(20)
 print Bank::Account.find(15155)
 Bank::Account.all[1].deposit(20)
 Bank::Account.all[1].withdraw(60)
+Bank::Account.all[1].deposit(-20)
