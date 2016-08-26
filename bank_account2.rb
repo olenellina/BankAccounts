@@ -1,11 +1,11 @@
-# time is required to store the openDate attribute correctly (in case it's needed later)
+# Time is required to store the openDate attribute correctly (in case it's needed later)
 require 'time'
 require 'csv'
 
 # The Bank module will hold four total classes: Account, CsvAccountProcessor, SavingsAccount & CheckingAccount
 module Bank
 
-  # The Account class has two responsiblites (setting up the Account objects and handling the primary functions around balance)
+  # The Account class has two responsiblites (setting up the Account objects and handling functions around balance)
   # Ideally, I might want to instead make two classes out of this: one for setting up Account objects and another for manipulating and tracking the account balance
   class Account
     # @@accounts is the class variable that will hold all instances of Account objects
@@ -23,7 +23,7 @@ module Bank
       @id = id.to_i
       @balance = balance.to_i
       @openDate = Time.parse(openDate)
-      # Adding a message, so I can ensure the accounts in a .csv file are created
+      # Adding a message, so I can ensure the accounts are created
       puts "Account ID #{id} has been created!"
       # Adding the current object (self) to the @@accounts array
       @@accounts << self
@@ -31,7 +31,7 @@ module Bank
 
     # Account method that will handle withdraw operations
     def withdraw(withdrawAmount)
-      # This if statement will negative a withdraw if the user tries to withdram more than the current account balance
+      # This if statement will negate a withdraw if the user tries to withdraw more than the current account balance
       if withdrawAmount > @balance
         return @balance
       else
@@ -66,10 +66,10 @@ module Bank
     end
   end
 
-  # The Account class only handles processing a .csv file for the parameters to pass to the Constructor for Account objects
+  # The Account class only handles processing a .csv file to get the parameters required to pass to the Constructor for Account objects
   class CsvAccountProcessor
     def initialize(csvfile)
-      # First, I'm creating an array to hold each line of the .csv file as an array object (it's an array of arrays, as each object is itself an array)
+      # Creating an array to hold each line of the .csv file as an array object (it's an array of arrays, as each object is itself an array)
       accountArray = []
       counter = 0
       CSV.open(csvfile, "r").each do |line|
@@ -77,7 +77,7 @@ module Bank
         counter += 1
       end
 
-      # Creating new Account objects by passing in the required parameters by idexing into through locations in the array
+      # Creating new Account objects by passing in the required parameters by idexing into locations in the array where those parameters are stored
       accountArray.length.times do |x|
         Account.new(accountArray[x][0], accountArray[x][1], accountArray[x][2])
       end
@@ -97,7 +97,7 @@ module Bank
 
       def withdraw(withdrawAmount)
         # Super allows me to extend the withdraw method in the Account class
-        # Here I'm adding on functionality specific to savings accounts (transaction fee, maintaining minimum balance)
+        # Adding functionality specific to savings accounts (transaction fee, maintaining minimum balance)
         super
         @balance -= 2
         if balance < 10
@@ -127,11 +127,11 @@ module Bank
         @freechecks = 0
       end
 
-      # This withdraw method extends the withdram method in the Accounts class, for specific needs of CheckingAccount objects
+      # This withdraw method extends the withdraw method in the Accounts class, for specific needs of CheckingAccount objects
       def withdraw(withdrawAmount)
         super
         # This extended functionality implements a $1.00 transaction fee for all withdraws on CheckingAccount objects
-        # If that withdraw (plus the transaction fee) make the balance negative, the whole transaction is voided (in a sense) and the balance is returned as the original balance
+        # If that withdraw (plus the transaction fee) makes the balance negative, the whole transaction is voided (in a sense) and the balance is returned as the original balance
         @balance -= 1
         if balance < 0
           puts "Sorry, you cannot withdraw more than your account balance."
@@ -142,7 +142,7 @@ module Bank
         end
       end
 
-      # The withdraw method is unique to the CheckingAccount class but I would like to eventually try to reuse the code in withdraw (if possible)
+      # The withdraw_using_check method is unique to the CheckingAccount class but I would like to eventually try to reuse the code in withdraw (if possible)
       def withdraw_using_check(amount)
         # Here I'm checking to see whether 3 free checks have already been used
         # If so, I then check to ensure that withdrawing the withdraw amount minus the check fee will not make the balance negative by more than $10.00
@@ -150,7 +150,7 @@ module Bank
           if balance - amount - 2 >= -10
             @balance = balance - amount - 2
             @freechecks += 1
-            return @balance
+            return @balanceg
           else
             return @balance
           end
@@ -167,7 +167,7 @@ module Bank
         end
       end
 
-      # When called, the reset_checks method resets free checks to 0 (the assumption is that this would be called each month)
+      # When called, the reset_checks method resets the free checks counter to 0 (the assumption is that this would be called each month)
       def reset_checks
         @freechecks = 0
       end
