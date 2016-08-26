@@ -61,6 +61,8 @@ module Bank
       @@accounts.length.times do |x|
         if @@accounts[x].id == id
           return @@accounts[x]
+        else
+          return "Account ID: #{id} is not in the system."
         end
       end
     end
@@ -123,9 +125,9 @@ module Bank
       def initialize(id, balance, openDate)
         # Super allows me to extend the Constructor in the Accounts class
         # Adding a new attribute to CheckingAccount objects, which will track the amount of free checks used for those accounts
+        # Also adding a instance variable to track days in the month, for considering when to call reset_checks
         super
         @freechecks = 0
-        @dayInMonth = 0
       end
 
       # This withdraw method extends the withdraw method in the Accounts class, for specific needs of CheckingAccount objects
@@ -144,42 +146,32 @@ module Bank
       end
 
       # The withdraw_using_check method is unique to the CheckingAccount class but I would like to eventually try to reuse the code in withdraw (if possible)
-      def withdraw_using_check(amount, dayInMonth)
-        # Here I'm checking to see whether 3 free checks have already been used
-        # If so, I then check to ensure that withdrawing the withdraw amount minus the check fee will not make the balance negative by more than $10.00
-        if @freechecks >= 3 && dayInMonth <= 30
+      def withdraw_using_check(amount)
+        # Checking to see whether 3 free checks have already been used
+        # If so, check to ensure that withdrawing the amount minus the check fee will not make the balance negative by more than $10.00
+           if @freechecks >= 3
+             if balance - amount - 2 >= -10
+               @balance = balance - amount - 2
+               @freechecks += 1
+               return @balance
+             else
+               return @balance
+             end
+           else
+            # If the code gets here, 3 free checks have not been used but we still need to check whether the withdraw amount would cause the balance to be negative by more than $10.00
+            if balance - amount >= -10
+              @balance = balance - amount
+               @freechecks += 1
+               return @balance
+             else
+               return @balance
+             end
+           end
+         end
 
-          if balance - amount - 2 >= -10
-            @balance = balance - amount - 2
-            @freechecks += 1
-            return @balance
-          else
-            return @balance
-          end
-
-        elsif dayInMonth > 30
-          reset_checks
-          if balance - amount >= -10
-            @balance = balance - amount
-            @freechecks += 1
-            return @balance
-          else
-            return @balance
-          end
-
-        elsif balance - amount >= -10
-            @balance = balance - amount
-            @freechecks += 1
-            return @balance
-        else
-            return @balance
-        end
-
-      end
-
-      # When called, the reset_checks method resets the free checks counter to 0 (the assumption is that this would be called each month)
+      # When called, the reset_checks method resets the free checks counter to 0
       def reset_checks
-        @freechecks = 0
+        return @freechecks = 0
       end
 
     end
@@ -192,6 +184,7 @@ end
 # Bank::Account.all[1].withdraw(20)
 # print Bank::Account.find(15155)
 # Bank::Account.all[1].deposit(-20)
+# print Bank::Account.find(1)
 
 # Operations for Savings Account Class (Wave 3)
 # mySavings = Bank::SavingsAccount.new("1212", "20", "1999-03-27 11:30:09 -0800")
@@ -203,9 +196,11 @@ end
 # Operations for Checking Account Class (Wave 3)
 myChecking = Bank::CheckingAccount.new("1313", "200", "1999-03-27 11:30:09 -0800")
 puts myChecking.balance
-puts myChecking.withdraw_using_check(8, 12)
-puts myChecking.withdraw_using_check(8, 15)
-puts myChecking.withdraw_using_check(8, 18)
-puts myChecking.withdraw_using_check(8, 30)
-puts myChecking.reset_checks
-puts myChecking.withdraw_using_check(8, 12)
+puts myChecking.deposit(200)
+puts myChecking.withdraw_using_check(8)
+puts myChecking.withdraw_using_check(8)
+puts myChecking.withdraw_using_check(8)
+puts myChecking.withdraw_using_check(8)
+puts myChecking.withdraw_using_check(8)
+myChecking.reset_checks
+puts myChecking.withdraw_using_check(8)
