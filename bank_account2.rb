@@ -121,10 +121,11 @@ module Bank
     # The CheckingAccount class handles the operations for checking accounts that are unique to these objects, and not all Accounts
     class CheckingAccount < Account
       def initialize(id, balance, openDate)
-        # super allows me to extend the Constructor in the Accounts class
+        # Super allows me to extend the Constructor in the Accounts class
         # Adding a new attribute to CheckingAccount objects, which will track the amount of free checks used for those accounts
         super
         @freechecks = 0
+        @dayInMonth = 0
       end
 
       # This withdraw method extends the withdraw method in the Accounts class, for specific needs of CheckingAccount objects
@@ -143,20 +144,21 @@ module Bank
       end
 
       # The withdraw_using_check method is unique to the CheckingAccount class but I would like to eventually try to reuse the code in withdraw (if possible)
-      def withdraw_using_check(amount)
+      def withdraw_using_check(amount, dayInMonth)
         # Here I'm checking to see whether 3 free checks have already been used
         # If so, I then check to ensure that withdrawing the withdraw amount minus the check fee will not make the balance negative by more than $10.00
-        if @freechecks >= 3
+        if @freechecks >= 3 && dayInMonth <= 30
+
           if balance - amount - 2 >= -10
             @balance = balance - amount - 2
             @freechecks += 1
-            return @balanceg
+            return @balance
           else
             return @balance
           end
-        else
-          # If the code gets to this place, less than 3 free checks have been used, so the transaction fee does not need to be added.
-          # However, there still needs to be a check to ensure that the balance will not dip below -$10.00
+
+        elsif dayInMonth > 30
+          reset_checks
           if balance - amount >= -10
             @balance = balance - amount
             @freechecks += 1
@@ -164,7 +166,15 @@ module Bank
           else
             return @balance
           end
+
+        elsif balance - amount >= -10
+            @balance = balance - amount
+            @freechecks += 1
+            return @balance
+        else
+            return @balance
         end
+
       end
 
       # When called, the reset_checks method resets the free checks counter to 0 (the assumption is that this would be called each month)
@@ -193,9 +203,9 @@ end
 # Operations for Checking Account Class (Wave 3)
 myChecking = Bank::CheckingAccount.new("1313", "200", "1999-03-27 11:30:09 -0800")
 puts myChecking.balance
-puts myChecking.withdraw_using_check(8)
-puts myChecking.withdraw_using_check(8)
-puts myChecking.withdraw_using_check(8)
-puts myChecking.withdraw_using_check(8)
+puts myChecking.withdraw_using_check(8, 12)
+puts myChecking.withdraw_using_check(8, 15)
+puts myChecking.withdraw_using_check(8, 18)
+puts myChecking.withdraw_using_check(8, 30)
 puts myChecking.reset_checks
-puts myChecking.withdraw_using_check(8)
+puts myChecking.withdraw_using_check(8, 12)
